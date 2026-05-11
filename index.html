@@ -30,17 +30,15 @@ input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px soli
 .info-card { background: #16213e; border-radius: 12px; padding: 15px; }
 .info-card .val { font-size: 2em; font-weight: bold; color: #4fc3f7; }
 .info-card .lbl { font-size: 0.85em; color: #aaa; }
-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.85em; }
-th { background: #16213e; padding: 10px; text-align: left; color: #4fc3f7; }
-td { padding: 8px 10px; border-bottom: 1px solid #2a2a4a; }
-tr:hover td { background: #1e2a4a; }
 .consigne-box { background: #16213e; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left; }
 .consigne-box li { margin: 8px 0; }
+.status-msg { font-size: 0.9em; color: #aaa; margin-top: 10px; }
+.status-msg.ok { color: #66bb6a; }
+.status-msg.err { color: #ef5350; }
 </style>
 </head>
 <body>
 
-<!-- ECRAN 1: Accueil -->
 <div class="screen active" id="screen-accueil">
 <h1>Tâche N-Back</h1>
 <p>Bienvenue dans cette expérience sur la mémoire de travail.</p>
@@ -69,17 +67,16 @@ tr:hover td { background: #1e2a4a; }
 <button class="btn" onclick="goToInstructions()">Suivant →</button>
 </div>
 
-<!-- ECRAN 2: Instructions -->
 <div class="screen" id="screen-instructions">
 <h2>Instructions</h2>
 <div class="consigne-box">
-<p>Dans cette tâche, des <strong>lettres</strong> vont apparaître une à une au centre de l'écran.</p>
-<p>Votre rôle est de décider si la lettre affichée est <strong>identique à celle présentée <span id="n-back-label">2</span> essai(s) avant</strong>.</p>
+<p>Des <strong>lettres</strong> vont apparaître une à une au centre de l'écran.</p>
+<p>Décidez si la lettre est <strong>identique à celle présentée <span id="n-back-label">2</span> essai(s) avant</strong>.</p>
 <ul style="margin-left:20px; margin-top:10px;">
-<li>Appuyez sur <strong style="color:#66bb6a;">A</strong> ou cliquez sur <strong style="color:#66bb6a;">CIBLE</strong> si la lettre est identique.</li>
-<li>Appuyez sur <strong style="color:#ef5350;">L</strong> ou cliquez sur <strong style="color:#ef5350;">NON-CIBLE</strong> si elle est différente.</li>
-<li>Répondez le plus <strong>rapidement et précisément</strong> possible.</li>
-<li>Pour les <span id="n-back-label2">2</span> premiers essais, aucune réponse n'est attendue.</li>
+<li>Appuyez sur <strong style="color:#66bb6a;">A</strong> ou <strong style="color:#66bb6a;">CIBLE</strong> si identique.</li>
+<li>Appuyez sur <strong style="color:#ef5350;">L</strong> ou <strong style="color:#ef5350;">NON-CIBLE</strong> si différente.</li>
+<li>Répondez le plus rapidement et précisément possible.</li>
+<li>Pour les <span id="n-back-label2">2</span> premiers essais, aucune réponse attendue.</li>
 </ul>
 </div>
 <button class="btn grey" onclick="goTo('screen-accueil')">← Retour</button>
@@ -87,7 +84,6 @@ tr:hover td { background: #1e2a4a; }
 <button class="btn green" onclick="startTask(false)">Commencer directement</button>
 </div>
 
-<!-- ECRAN 3: Tâche -->
 <div class="screen" id="screen-task">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
 <span id="task-label" style="color:#aaa; font-size:0.9em;">Essai 0 / 0</span>
@@ -97,200 +93,162 @@ tr:hover td { background: #1e2a4a; }
 <div id="stimulus-box">?</div>
 <div id="feedback"></div>
 <div style="margin-top:20px;">
-<button class="btn green" id="btn-cible" onclick="handleResponse(true)">✔ CIBLE (A)</button>
-<button class="btn red" id="btn-noncible" onclick="handleResponse(false)">✘ NON-CIBLE (L)</button>
+<button class="btn green" onclick="handleResponse(true)">✔ CIBLE (A)</button>
+<button class="btn red" onclick="handleResponse(false)">✘ NON-CIBLE (L)</button>
 </div>
-<p style="color:#888; font-size:0.8em; margin-top:15px;">Touches clavier : A = Cible &nbsp;|&nbsp; L = Non-cible</p>
+<p style="color:#888; font-size:0.8em; margin-top:15px;">Touches : A = Cible &nbsp;|&nbsp; L = Non-cible</p>
 </div>
 
-<!-- ECRAN 4: Résultats -->
 <div class="screen" id="screen-results">
 <h2>Résultats — <span id="res-participant"></span></h2>
 <div class="info-grid">
 <div class="info-card"><div class="val" id="res-accuracy">-</div><div class="lbl">Précision (%)</div></div>
-<div class="info-card"><div class="val" id="res-rt">-</div><div class="lbl">Temps de réaction moyen (ms)</div></div>
-<div class="info-card"><div class="val" id="res-hits">-</div><div class="lbl">Hits (vrais positifs)</div></div>
+<div class="info-card"><div class="val" id="res-rt">-</div><div class="lbl">TR moyen (ms)</div></div>
+<div class="info-card"><div class="val" id="res-hits">-</div><div class="lbl">Hits</div></div>
 <div class="info-card"><div class="val" id="res-fa">-</div><div class="lbl">Fausses alarmes</div></div>
 <div class="info-card"><div class="val" id="res-miss">-</div><div class="lbl">Omissions</div></div>
 <div class="info-card"><div class="val" id="res-cr">-</div><div class="lbl">Rejets corrects</div></div>
 </div>
-<button class="btn" onclick="downloadCSV()">⬇ Télécharger mes données (CSV)</button>
+<p id="sheet-status" class="status-msg">Envoi des données en cours...</p>
+<button class="btn" onclick="downloadCSV()">⬇ Télécharger CSV (backup)</button>
 <button class="btn green" onclick="restartTask()">Recommencer</button>
 </div>
 
 <script>
-let nLevel = 2, nTrials = 30, participantId = '', condition = 'controle';
-let sequence = [], responses = [], trialData = [];
-let currentTrial = 0, stimulusTimer = null, responseTimer = null;
-let stimulusStart = 0, responded = false, isPractice = false;
-const LETTERS = 'BCDFGHJKLMNPQRSTVWXZ';
-const STIM_DURATION = 500;
-const ISI = 2500;
-const TARGET_RATIO = 0.33;
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxVRcIlv-CEDkErswi1jPPFGZaPV9LZTaOtgpnkKaKJPyRV5CeiDQZrw4qlGUS3wfPO/exec';
+let nLevel=2, nTrials=30, participantId='', condition='controle';
+let sequence=[], trialData=[];
+let currentTrial=0, stimulusTimer=null, responseTimer=null;
+let stimulusStart=0, responded=false, isPractice=false;
+const LETTERS='BCDFGHJKLMNPQRSTVWXZ';
+const STIM_DURATION=500, ISI=2500, TARGET_RATIO=0.33;
 
-function goTo(id) {
- document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
- document.getElementById(id).classList.add('active');
-}
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-function goToInstructions() {
- const pid = document.getElementById('participant-id').value.trim();
- if (!pid) { alert('Veuillez entrer un ID participant.'); return; }
- participantId = pid;
- condition = document.getElementById('condition').value;
- nLevel = parseInt(document.getElementById('n-level').value);
- nTrials = parseInt(document.getElementById('n-trials').value);
- document.getElementById('n-back-label').textContent = nLevel;
- document.getElementById('n-back-label2').textContent = nLevel;
- goTo('screen-instructions');
-}
+function goToInstructions(){
+const pid=document.getElementById('participant-id').value.trim();
+if(!pid){alert('Veuillez entrer un ID participant.');return;}
+participantId=pid; condition=document.getElementById('condition').value;
+nLevel=parseInt(document.getElementById('n-level').value);
+nTrials=parseInt(document.getElementById('n-trials').value);
+document.getElementById('n-back-label').textContent=nLevel;
+document.getElementById('n-back-label2').textContent=nLevel;
+goTo('screen-instructions');}
 
-function generateSequence(n) {
- const seq = [];
- for (let i = 0; i < n; i++) {
- let letter;
- if (i >= nLevel && Math.random() < TARGET_RATIO) {
- letter = seq[i - nLevel];
- } else {
- do { letter = LETTERS[Math.floor(Math.random() * LETTERS.length)]; }
- while (i >= nLevel && letter === seq[i - nLevel]);
- }
- seq.push(letter);
- }
- return seq;
-}
+function generateSequence(n){
+const seq=[];
+for(let i=0;i<n;i++){
+let letter;
+if(i>=nLevel&&Math.random()<TARGET_RATIO){letter=seq[i-nLevel];}
+else{do{letter=LETTERS[Math.floor(Math.random()*LETTERS.length)];}while(i>=nLevel&&letter===seq[i-nLevel]);}
+seq.push(letter);}
+return seq;}
 
-function startPractice() {
- isPractice = true;
- sequence = generateSequence(5 + nLevel);
- trialData = []; responses = []; currentTrial = 0;
- document.getElementById('phase-label').textContent = 'ENTRAÎNEMENT';
- goTo('screen-task');
- runTrial();
-}
+function startPractice(){
+isPractice=true; sequence=generateSequence(5+nLevel);
+trialData=[]; currentTrial=0;
+document.getElementById('phase-label').textContent='ENTRAÎNEMENT';
+goTo('screen-task'); runTrial();}
 
-function startTask(fromPractice) {
- isPractice = false;
- sequence = generateSequence(nTrials);
- trialData = []; responses = []; currentTrial = 0;
- document.getElementById('phase-label').textContent = 'TÂCHE PRINCIPALE';
- goTo('screen-task');
- runTrial();
-}
+function startTask(){
+isPractice=false; sequence=generateSequence(nTrials);
+trialData=[]; currentTrial=0;
+document.getElementById('phase-label').textContent='TÂCHE PRINCIPALE';
+goTo('screen-task'); runTrial();}
 
-function runTrial() {
- if (currentTrial >= sequence.length) { endTask(); return; }
- responded = false;
- const total = sequence.length;
- document.getElementById('task-label').textContent = `Essai ${currentTrial + 1} / ${total}`;
- document.getElementById('progress-bar').style.width = ((currentTrial / total) * 100) + '%';
- document.getElementById('feedback').textContent = '';
- document.getElementById('feedback').className = '';
- const box = document.getElementById('stimulus-box');
- box.textContent = sequence[currentTrial];
- stimulusStart = performance.now();
+function runTrial(){
+if(currentTrial>=sequence.length){endTask();return;}
+responded=false;
+document.getElementById('task-label').textContent=`Essai ${currentTrial+1} / ${sequence.length}`;
+document.getElementById('progress-bar').style.width=((currentTrial/sequence.length)*100)+'%';
+document.getElementById('feedback').textContent='';
+document.getElementById('feedback').className='';
+const box=document.getElementById('stimulus-box');
+box.textContent=sequence[currentTrial];
+stimulusStart=performance.now();
+stimulus Timer=setTimeout(()=>{
+box.textContent='';
+if(currentTrial<nLevel){currentTrial++;setTimeout(runTrial,ISI-STIM_DURATION);}
+else{responseTimer=setTimeout(()=>{
+if(!responded){
+const isTarget=sequence[currentTrial]===sequence[currentTrial-nLevel];
+if(isTarget)showFeedback('Omission','miss');
+recordTrial(null,null,isTarget);
+currentTrial++;setTimeout(runTrial,300);}},ISI-STIM_DURATION);}},STIM_DURATION);}
 
- stimulusTimer = setTimeout(() => {
- box.textContent = '';
- if (currentTrial < nLevel) {
- currentTrial++;
- setTimeout(runTrial, ISI - STIM_DURATION);
- } else {
- responseTimer = setTimeout(() => {
- if (!responded) {
- const isTarget = sequence[currentTrial] === sequence[currentTrial - nLevel];
- if (isTarget) { showFeedback('Omission', 'miss'); }
- recordTrial(null, null, isTarget);
- currentTrial++;
- setTimeout(runTrial, 300);
- }
- }, ISI - STIM_DURATION);
- }
- }, STIM_DURATION);
-}
+function handleResponse(isCible){
+if(responded||currentTrial<nLevel)return;
+clearTimeout(responseTimer); responded=true;
+const rt=Math.round(performance.now()-stimulusStart);
+const isTarget=sequence[currentTrial]===sequence[currentTrial-nLevel];
+if(isCible===isTarget)showFeedback('Correct !','correct');
+else showFeedback('Incorrect','incorrect');
+recordTrial(isCible,rt,isTarget);
+currentTrial++;setTimeout(runTrial,600);}
 
-function handleResponse(isCiblePressed) {
- if (responded || currentTrial < nLevel) return;
- clearTimeout(responseTimer);
- responded = true;
- const rt = Math.round(performance.now() - stimulusStart);
- const isTarget = sequence[currentTrial] === sequence[currentTrial - nLevel];
- const correct = isCiblePressed === isTarget;
- if (correct) showFeedback('Correct !', 'correct');
- else showFeedback('Incorrect', 'incorrect');
- recordTrial(isCiblePressed, rt, isTarget);
- currentTrial++;
- setTimeout(runTrial, 600);
-}
+function recordTrial(response,rt,isTarget){
+trialData.push({participant:participantId,condition,nLevel,trial:currentTrial+1,stimulus:sequence[currentTrial],isTarget,response,rt,correct:response===null?false:response===isTarget,type:response===null?(isTarget?'miss':'cr_no_resp'):(isTarget&&response?'hit':!isTarget&&!response?'cr':isTarget&&!response?'miss':'fa'),date:new Date().toISOString()});}
 
-function recordTrial(response, rt, isTarget) {
- trialData.push({
- participant: participantId,
- condition: condition,
- nLevel: nLevel,
- trial: currentTrial + 1,
- stimulus: sequence[currentTrial],
- isTarget: isTarget,
- response: response,
- rt: rt,
- correct: response === null ? false : response === isTarget,
- type: response === null ? (isTarget ? 'miss' : 'cr_no_resp') :
- (isTarget && response ? 'hit' : !isTarget && !response ? 'cr' : isTarget && !response ? 'miss' : 'fa'),
- date: new Date().toISOString()
- });
-}
+function showFeedback(msg,cls){const fb=document.getElementById('feedback');fb.textContent=msg;fb.className=cls;}
 
-function showFeedback(msg, cls) {
- const fb = document.getElementById('feedback');
- fb.textContent = msg;
- fb.className = cls;
-}
+function endTask(){
+if(isPractice){
+if(confirm('Entraînement terminé ! Prêt(e) pour la tâche principale ?'))startTask();
+return;}
+const valid=trialData.filter(t=>t.response!==null);
+const acc=valid.length?Math.round((valid.filter(t=>t.correct).length/valid.length)*100):0;
+const rts=valid.filter(t=>t.rt!==null).map(t=>t.rt);
+const avgRT=rts.length?Math.round(rts.reduce((a,b)=>a+b,0)/rts.length):0;
+const hits=trialData.filter(t=>t.type==='hit').length;
+const fa=trialData.filter(t=>t.type==='fa').length;
+const miss=trialData.filter(t=>t.type==='miss').length;
+const cr=trialData.filter(t=>t.type==='cr').length;
+document.getElementById('res-participant').textContent=participantId;
+document.getElementById('res-accuracy').textContent=acc+'%';
+document.getElementById('res-rt').textContent=avgRT;
+document.getElementById('res-hits').textContent=hits;
+document.getElementById('res-fa').textContent=fa;
+document.getElementById('res-miss').textContent=miss;
+document.getElementById('res-cr').textContent=cr;
+goTo('screen-results');
+sendToSheets({participant:participantId,condition,nLevel,nTrials:sequence.length,precision:acc,rt_moyen:avgRT,hits,fausses_alarmes:fa,omissions:miss,rejets_corrects:cr,date:new Date().toISOString()});}
 
-function endTask() {
- if (isPractice) {
- if (confirm('Entraînement terminé ! Prêt(e) pour la tâche principale ?')) startTask(true);
- return;
- }
- const validTrials = trialData.filter(t => t.response !== null);
- const correct = validTrials.filter(t => t.correct).length;
- const accuracy = validTrials.length ? Math.round((correct / validTrials.length) * 100) : 0;
- const rts = validTrials.filter(t => t.rt !== null).map(t => t.rt);
- const avgRT = rts.length ? Math.round(rts.reduce((a, b) => a + b, 0) / rts.length) : 0;
- const hits = trialData.filter(t => t.type === 'hit').length;
- const fa = trialData.filter(t => t.type === 'fa').length;
- const miss = trialData.filter(t => t.type === 'miss').length;
- const cr = trialData.filter(t => t.type === 'cr').length;
- document.getElementById('res-participant').textContent = participantId;
- document.getElementById('res-accuracy').textContent = accuracy + '%';
- document.getElementById('res-rt').textContent = avgRT;
- document.getElementById('res-hits').textContent = hits;
- document.getElementById('res-fa').textContent = fa;
- document.getElementById('res-miss').textContent = miss;
- document.getElementById('res-cr').textContent = cr;
- goTo('screen-results');
-}
+function sendToSheets(data){
+const status=document.getElementById('sheet-status');
+status.textContent='Envoi des données en cours...';
+status.className='status-msg';
+fetch(WEBAPP_URL,{method:'POST',body:JSON.stringify(data)})
+.then(r=>r.json())
+.then(res=>{
+if(res.status==='ok'){
+status.textContent='✅ Données envoyées avec succès dans Google Sheets !';
+status.className='status-msg ok';}
+else{
+status.textContent='⚠️ Erreur lors de l\'envoi. Téléchargez le CSV.';
+status.className='status-msg err';}})
+.catch(()=>{
+status.textContent='⚠️ Impossible d\'envoyer. Téléchargez le CSV.';
+status.className='status-msg err';});}
 
-function downloadCSV() {
- const headers = ['participant','condition','nLevel','trial','stimulus','isTarget','response','rt','correct','type','date'];
- const rows = trialData.map(t => headers.map(h => JSON.stringify(t[h] ?? '')).join(','));
- const csv = [headers.join(','), ...rows].join('\n');
- const blob = new Blob([csv], { type: 'text/csv' });
- const url = URL.createObjectURL(blob);
- const a = document.createElement('a');
- a.href = url;
- a.download = `nback_${participantId}_${new Date().toISOString().slice(0,10)}.csv`;
- a.click();
- URL.revokeObjectURL(url);
-}
+function downloadCSV(){
+const headers=['participant','condition','nLevel','trial','stimulus','isTarget','response','rt','correct','type','date'];
+const rows=trialData.map(t=>headers.map(h=>JSON.stringify(t[h]??'')).join(','));
+const csv=[headers.join(','),...rows].join('\n');
+const blob=new Blob([csv],{type:'text/csv'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=`nback_${participantId}_${new Date().toISOString().slice(0,10)}.csv`;
+a.click();
+URL.revokeObjectURL(url);}
 
-function restartTask() { goTo('screen-accueil'); }
+function restartTask(){goTo('screen-accueil');}
 
-document.addEventListener('keydown', (e) => {
- if (document.getElementById('screen-task').classList.contains('active')) {
- if (e.key === 'a' || e.key === 'A') handleResponse(true);
- if (e.key === 'l' || e.key === 'L') handleResponse(false);
- }
-});
+document.addEventListener('keydown',(e)=>{
+if(document.getElementById('screen-task').classList.contains('active')){
+if(e.key==='a'||e.key==='A')handleResponse(true);
+if(e.key==='l'||e.key==='L')handleResponse(false);
+}});
 </script>
 </body>
 </html>
