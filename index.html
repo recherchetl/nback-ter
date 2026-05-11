@@ -166,7 +166,7 @@ document.getElementById('feedback').className='';
 const box=document.getElementById('stimulus-box');
 box.textContent=sequence[currentTrial];
 stimulusStart=performance.now();
-stimulus Timer=setTimeout(()=>{
+stimulusTimer=setTimeout(()=>{
 box.textContent='';
 if(currentTrial<nLevel){currentTrial++;setTimeout(runTrial,ISI-STIM_DURATION);}
 else{responseTimer=setTimeout(()=>{
