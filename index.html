@@ -217,7 +217,7 @@ function sendToSheets(data){
 const status=document.getElementById('sheet-status');
 status.textContent='Envoi des données en cours...';
 status.className='status-msg';
-fetch(WEBAPP_URL,{method:'POST',body:JSON.stringify(data)})
+fetch(WEBAPP_URL,{method:'POST',headers:{'Content-Type':'text/plain'},     body:JSON.stringify(data)})
 .then(r=>r.json())
 .then(res=>{
 if(res.status==='ok'){
