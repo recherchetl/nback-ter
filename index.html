@@ -217,8 +217,8 @@ function sendToSheets(data){
 const status=document.getElementById('sheet-status');
 status.textContent='Envoi des données en cours...';
 status.className='status-msg';
-fetch(WEBAPP_URL,{method:'POST',headers:{'Content-Type':'text/plain'},     body:JSON.stringify(data)})
-.then(r=>r.json())
+fetch(WEBAPP_URL+'?data='+encodeURIComponent(JSON.stringify(data)),{mode:'no-cors',     })
+.then(()=>({status:'ok'}))
 .then(res=>{
 if(res.status==='ok'){
 status.textContent='✅ Données envoyées avec succès dans Google Sheets !';
